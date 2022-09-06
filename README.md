@@ -17,10 +17,10 @@ Users in the database have the following properties:
 ```js
 {
   "fullName": String,
+  "username": String,
   "email": String,
   "hashedPassword": String,
-  "idCard": String,
-  "items": [id]
+  "idCard": String
 }
 ```
 
@@ -33,10 +33,12 @@ Items in the database have the following properties:
   "name": String,
   "brand": String,
   "isNew": Boolean,
+  "type": String,
   "serialNumber": String,
   "warrantyPicture": String,
   "snPicture": String,
-  "itemPicture: String
+  "itemPicture": String,
+  "owner": id
 }
 ```
 

@@ -15,10 +15,14 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  role: {
+  idNumber: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
+    unique: true,
+    required: true
+  },
+  fullName: {
+    type: String,
+    required: true
   }
 },
   {
