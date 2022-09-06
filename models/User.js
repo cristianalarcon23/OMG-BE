@@ -7,6 +7,10 @@ const userSchema = new Schema({
     unique: true,
     required: true
   },
+  fullName: {
+    type: String,
+    required: true
+  },
   hashedPassword: {
     type: String,
     required: true
@@ -19,10 +23,9 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     required: true
-  },
-  fullName: {
+  }, 
+  profilePicture: {
     type: String,
-    required: true
   }
 },
   {

@@ -32,7 +32,6 @@ const itemSchema = new Schema({
   },
   warrantyPicture: {
     type: String,
-    required: true
   },
   owner: {
     type: Schema.Types.ObjectId,

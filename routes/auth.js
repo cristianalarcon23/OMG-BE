@@ -10,9 +10,9 @@ const saltRounds = 10;
 // @route   POST /api/v1/auth/signup
 // @access  Public
 router.post('/signup', async (req, res, next) => {
-  const { email, password, username } = req.body;
+  const { email, fullName, password, username, idNumber, profilePicture } = req.body;
   // Check if email or password or name are provided as empty string 
-  if (email === "" || password === "" || username === "") {
+  if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "" || profilePicture === "") {
     return next(new ErrorResponse('Please fill all the fields to register', 400))
   }
   // Use regex to validate the email format
@@ -25,16 +25,26 @@ router.post('/signup', async (req, res, next) => {
   if (!passwordRegex.test(password)) {
     return next(new ErrorResponse('Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter', 400))
   }
+  // Use regex to validate idNumber format
+  const nifRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+  if (!nifRegex.test(idNumber)) {
+    return next(new ErrorResponse('Spanish ID format not valid', 400));
+  }
   try {
-    const userInDB = await User.findOne({ email });
-    if (userInDB) {
+    const userMailInDB = await User.findOne({ email });
+    const nifInDB = await User.findOne({idNumber});
+    if (userMailInDB) {
       return next(new ErrorResponse(`User already exists with email ${email}`, 400))
-    } else {
+    } 
+    if (nifInDB) {
+      return next(new ErrorResponse(`This ID is already registered`, 400))
+    }
+    else {
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const user = await User.create({ email, hashedPassword, username });
+      const user = await User.create({ email, hashedPassword, username, fullName, idNumber, profilePicture });
       const publicUser = { // Decide what fields of our user we want to return 
-        username: user.username,
+        fullName: user.fullName,
         email: user.email,
       }
       res.status(201).json({ data: publicUser });
@@ -84,6 +94,30 @@ router.post('/login', async (req, res, next) => {
     next(error)
   }
 });
+
+
+// @desc    Edits logged in user
+// @route   PUT /api/v1/auth/user
+// @access  Private
+router.put('/user', async (req, res, next) => {
+  const {username, password, _id} = req.body;
+  if (username === "" || password === "") {
+    return next(new ErrorResponse('Please fill all the fields before editing', 400))
+  }
+  const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
+  if (!passwordRegex.test(password)) {
+    return next(new ErrorResponse('Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter', 400))
+  }
+  try {
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    const updatedUser = await User.findByIdAndUpdate(_id, { hashedPassword, username }, {new: true});
+    res.status(202).json({ data: updatedUser });
+  } catch (error) {
+    next(error);
+  }
+})
+
 
 // @desc    GET logged in user
 // @route   GET /api/v1/auth/me
