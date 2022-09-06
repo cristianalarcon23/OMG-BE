@@ -38,7 +38,7 @@ Items in the database have the following properties:
   "warrantyPicture": String,
   "snPicture": String,
   "itemPicture": String,
-  "owner": id
+  "owner": Schema.Types.ObjectId
 }
 ```
 
