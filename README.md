@@ -20,7 +20,7 @@ Users in the database have the following properties:
   "username": String,
   "email": String,
   "hashedPassword": String,
-  "idCard": String
+  "idNumber": String
 }
 ```
 
@@ -57,11 +57,12 @@ Alerts in the database have the following properties:
 
 ## API endpoints and usage
 
-| Action             | Method | Endpoint            | Req.body                      | Private/Public |
-| ------------------ | ------ | ------------------- | ----------------------------- | -------------- |
-| SIGN UP user       | POST   | /api/v1/auth/signup | { username, email, password } | Public         |
-| LOG IN user        | POST   | /api/v1/auth/login  | { email, password }           | Public         |
-| GET logged in user | GET    | /api/v1/auth/me     |                               | Private        |
+| Action             | Method | Endpoint            | Req.body                                                          | Private/Public |
+| ------------------ | ------ | ------------------- | ----------------------------------------------------------------- | -------------- |
+| SIGN UP user       | POST   | /api/v1/auth/signup | { username, email, password, fullName, idNumber, profilePicture } | Public         |
+| LOG IN user        | POST   | /api/v1/auth/login  | { email, password }                                               | Public         |
+| GET logged in user | GET    | /api/v1/auth/me     |                                                                   | Private        |
+| PUT edits user     | PUT    | /api/v1/auth/user   | {username, password, id}                                          | Private        |
 
 ---
 
