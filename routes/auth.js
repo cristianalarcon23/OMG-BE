@@ -99,8 +99,9 @@ router.post('/login', async (req, res, next) => {
 // @desc    Edits logged in user
 // @route   PUT /api/v1/auth/user
 // @access  Private
-router.put('/user', async (req, res, next) => {
-  const {username, password, _id} = req.body;
+router.put('/user', isAuthenticated, async (req, res, next) => {
+  const {username, password} = req.body;
+  const id = req.payload._id;
   if (username === "" || password === "") {
     return next(new ErrorResponse('Please fill all the fields before editing', 400))
   }
@@ -111,7 +112,7 @@ router.put('/user', async (req, res, next) => {
   try {
     const salt = bcrypt.genSaltSync(saltRounds);
     const hashedPassword = bcrypt.hashSync(password, salt);
-    const updatedUser = await User.findByIdAndUpdate(_id, { hashedPassword, username }, {new: true});
+    const updatedUser = await User.findByIdAndUpdate(id, { hashedPassword, username }, {new: true});
     res.status(202).json({ data: updatedUser });
   } catch (error) {
     next(error);

@@ -10,7 +10,7 @@ const itemSchema = new Schema({
     type: String,
     required: true
   },
-  isNew: {
+  secondHand: {
     type: Boolean,
     required: true
   },
@@ -34,6 +34,10 @@ const itemSchema = new Schema({
     type: String,
   },
   owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  previousOwner: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   }

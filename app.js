@@ -7,7 +7,7 @@ const cors = require('cors');
 const errorHandler = require('./middlewares/errorHandler');
 
 // Routers require
-const indexRouter = require('./routes/index');
+const itemsRouter = require('./routes/items');
 const authRouter = require('./routes/auth');
 
 const app = express();
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // routes intro
-app.use('/', indexRouter);
+app.use('/api/v1/items', itemsRouter);
 app.use('/api/v1/auth', authRouter);
 app.use(errorHandler);
 
