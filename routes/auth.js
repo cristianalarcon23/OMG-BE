@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const User = require('../models/User');
+const fileUploader = require("../config/cloudinary.config");
 const ErrorResponse = require('../utils/error');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
@@ -9,7 +10,7 @@ const saltRounds = 10;
 // @desc    SIGN UP new user
 // @route   POST /api/v1/auth/signup
 // @access  Public
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', fileUploader.single('profilePicture'), async (req, res, next) => {
   const { email, fullName, password, username, idNumber, profilePicture } = req.body;
   // Check if email or password or name are provided as empty string 
   if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "" || profilePicture === "") {
@@ -29,6 +30,9 @@ router.post('/signup', async (req, res, next) => {
   const nifRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
   if (!nifRegex.test(idNumber)) {
     return next(new ErrorResponse('Spanish ID format not valid', 400));
+  }
+  if(req.file) {
+    profilePicture = req.file.path;   
   }
   try {
     const userMailInDB = await User.findOne({ email });
