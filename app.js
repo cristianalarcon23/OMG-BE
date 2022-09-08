@@ -8,6 +8,7 @@ const errorHandler = require('./middlewares/errorHandler');
 
 // Routers require
 const itemsRouter = require('./routes/items');
+const alertsRouter = require('./routes/alerts');
 const authRouter = require('./routes/auth');
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // routes intro
 app.use('/api/v1/items', itemsRouter);
+app.use('/api/v1/alerts', alertsRouter);
 app.use('/api/v1/auth', authRouter);
 app.use(errorHandler);
 
