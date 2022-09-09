@@ -33,6 +33,9 @@ const itemSchema = new Schema({
   warrantyPicture: {
     type: String,
   },
+  transactionToken: {
+    type: String
+  },
   owner: {
     type: Schema.Types.ObjectId,
     ref: 'User'
