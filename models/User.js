@@ -26,6 +26,7 @@ const userSchema = new Schema({
   }, 
   profilePicture: {
     type: String,
+    default: "https://us.123rf.com/450wm/tuktukdesign/https://us.123rf.com/450wm/tuktukdesign/tuktukdesign1608/tuktukdesign160800043/61010830-icono-de-usuario-hombre-perfil-hombre-de-negocios-avatar-ilustraci%C3%B3n-vectorial-persona-glifo.jpg?ver=6/tuktukdesign160800043/61010830-icono-de-usuario-hombre-perfil-hombre-de-negocios-avatar-ilustraci%C3%B3n-vectorial-persona-glifo.jpg?ver=6"
   }
 },
   {

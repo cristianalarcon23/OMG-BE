@@ -11,9 +11,9 @@ const saltRounds = 10;
 // @route   POST /api/v1/auth/signup
 // @access  Public
 router.post('/signup', fileUploader.single('profilePicture'), async (req, res, next) => {
-  const { email, fullName, password, username, idNumber, profilePicture } = req.body;
+  const { email, fullName, password, username, idNumber, profilePictureDefault } = req.body;
   // Check if email or password or name are provided as empty string 
-  if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "" || profilePicture === "") {
+  if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "") {
     return next(new ErrorResponse('Please fill all the fields to register', 400))
   }
   // Use regex to validate the email format
@@ -31,8 +31,11 @@ router.post('/signup', fileUploader.single('profilePicture'), async (req, res, n
   if (!nifRegex.test(idNumber)) {
     return next(new ErrorResponse('Spanish ID format not valid', 400));
   }
+  let profilePicture;
   if(req.file) {
     profilePicture = req.file.path;   
+  } else {
+    profilePicture = profilePictureDefault;
   }
   try {
     const userMailInDB = await User.findOne({ email });
@@ -47,6 +50,7 @@ router.post('/signup', fileUploader.single('profilePicture'), async (req, res, n
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
       const user = await User.create({ email, hashedPassword, username, fullName, idNumber, profilePicture });
+      console.log(user);
       const publicUser = { // Decide what fields of our user we want to return 
         fullName: user.fullName,
         email: user.email,

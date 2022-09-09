@@ -61,17 +61,12 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @desc    Create an item
   // @route   POST /api/v1/items
   // @access  Private
-  router.post('/', isAuthenticated, fileUploader.single('itemPicture'), fileUploader.single('snPicture'), fileUploader.single('warrantyPicture'), async (req, res, next) => {
+  router.post('/', isAuthenticated, async (req, res, next) => {
     const { name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture } = req.body;
     if (name === "" || brand === "" || secondHand === undefined || type === "" || serialNumber === "" ||  itemPicture === "" || snPicture === "") {
         return next(new ErrorResponse('Please fill all the fields to create your item', 400))
     }
     const id = req.payload._id;
-    if(req.files) {
-        itemPicture = req.files.path; 
-        snPicture = req.files.path;
-        warrantyPicture = req.files.path;  
-      }
     try {
       const item = await Item.create({ name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture, owner: id });
       if (!item) {
@@ -86,17 +81,12 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @desc    Edit an item
   // @route   PUT /api/v1/items/:id
   // @access  Private
-  router.put('/:id', isAuthenticated, fileUploader.single('itemPicture'), fileUploader.single('snPicture'), fileUploader.single('warrantyPicture'), async (req, res, next) => {
+  router.put('/:id', isAuthenticated, async (req, res, next) => {
     const { id } = req.params;
     const { name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture } = req.body;
     if (name === "" || brand === "" || secondHand === undefined || type === "" || serialNumber === "" ||  itemPicture === "" || snPicture === "") {
         return next(new ErrorResponse('Please fill all the fields to edit your item', 400))
     }
-    if (req.files) {
-        itemPicture = req.files.path; 
-        snPicture = req.files.path;
-        warrantyPicture = req.files.path;  
-      }
     try {
       const item = await Item.findById(id);
       if (!item) {
