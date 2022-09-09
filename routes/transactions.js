@@ -45,10 +45,11 @@ router.get('/buy', isAuthenticated, async (req, res, next) => {
 router.post('/receive', isAuthenticated, async (req, res, next) => {
     const {token, email} = req.body;
     const userId = req.payload._id;
+    const resetedToken = "";
     try {
         const itemToCheck = await Item.findOne({transactionToken: parseInt(token)}).populate('owner');
         if (itemToCheck && email === itemToCheck.owner.email) {
-            const itemReceived = await Item.findByIdAndUpdate(itemToCheck._id, {owner: userId, previousOwner: itemToCheck.owner._id, transactionToken: undefined}, {new:true});
+            const itemReceived = await Item.findByIdAndUpdate(itemToCheck._id, {owner: userId, previousOwner: itemToCheck.owner._id, transactionToken: resetedToken}, {new:true});
             const transaction = await Transaction.create({itemId: itemToCheck._id, buyerId: userId, sellerId: itemToCheck.owner._id});
             res.status(201).json({ data: transaction, itemReceived })
         } else {
