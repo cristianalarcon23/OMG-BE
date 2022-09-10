@@ -7,7 +7,7 @@ const ErrorResponse = require('../utils/error');
 
 
 // @desc    Get all user items
-// @route   GET /api/v1/items/
+// @route   GET /api/v1/items
 // @access  Private
 router.get('/', isAuthenticated, async (req, res, next) => {
     const id = req.payload._id;
@@ -27,6 +27,9 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @access  Public
   router.get('/search', async (req, res, next) => {
     const {serialNumber} = req.body;
+    if (serialNumber === "") {
+      return next(new ErrorResponse('Please insert a Serial Number', 400))
+    }
     try {
       const item = await Item.findOne({serialNumber: serialNumber});
       if (!item) {
@@ -77,6 +80,7 @@ router.get('/', isAuthenticated, async (req, res, next) => {
       next(error);
     }
   });
+
   
   // @desc    Edit an item
   // @route   PUT /api/v1/items/:id
@@ -84,7 +88,7 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   router.put('/:id', isAuthenticated, async (req, res, next) => {
     const { id } = req.params;
     const { name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture } = req.body;
-    if (name === "" || brand === "" || secondHand === undefined || type === "" || serialNumber === "" ||  itemPicture === "" || snPicture === "") {
+    if (name === "" || brand === "" || type === "" || serialNumber === "" ||  itemPicture === "" || snPicture === "") {
         return next(new ErrorResponse('Please fill all the fields to edit your item', 400))
     }
     try {

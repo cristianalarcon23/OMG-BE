@@ -23,6 +23,10 @@ const userSchema = new Schema({
     type: String,
     unique: true,
     required: true
+  },
+  telephone: {
+    type: String,
+    required: true
   }, 
   profilePicture: {
     type: String,

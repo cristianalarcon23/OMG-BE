@@ -11,9 +11,9 @@ const saltRounds = 10;
 // @route   POST /api/v1/auth/signup
 // @access  Public
 router.post('/signup', fileUploader.single('profilePicture'), async (req, res, next) => {
-  const { email, fullName, password, username, idNumber, profilePictureDefault } = req.body;
+  const { email, fullName, password, username, idNumber, telephone, profilePictureDefault } = req.body;
   // Check if email or password or name are provided as empty string 
-  if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "") {
+  if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "" || telephone === "") {
     return next(new ErrorResponse('Please fill all the fields to register', 400))
   }
   // Use regex to validate the email format
@@ -31,12 +31,19 @@ router.post('/signup', fileUploader.single('profilePicture'), async (req, res, n
   if (!nifRegex.test(idNumber)) {
     return next(new ErrorResponse('Spanish ID format not valid', 400));
   }
+  // Use regex to validate telephone number
+  const telephoneRegex = /^\+?(6\d{2}|7[1-9]\d{1})\d{6}$/;
+  if (!telephoneRegex.test(telephone)) {
+    return next(new ErrorResponse('Telephone number is not valid', 400));
+  }
+
   let profilePicture;
   if(req.file) {
     profilePicture = req.file.path;   
   } else {
     profilePicture = profilePictureDefault;
   }
+
   try {
     const userMailInDB = await User.findOne({ email });
     const nifInDB = await User.findOne({idNumber});
@@ -49,7 +56,7 @@ router.post('/signup', fileUploader.single('profilePicture'), async (req, res, n
     else {
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const user = await User.create({ email, hashedPassword, username, fullName, idNumber, profilePicture });
+      const user = await User.create({ email, hashedPassword, username, fullName, idNumber, telephone, profilePicture });
       console.log(user);
       const publicUser = { // Decide what fields of our user we want to return 
         fullName: user.fullName,
@@ -110,17 +117,21 @@ router.post('/login', async (req, res, next) => {
 router.put('/user', isAuthenticated, async (req, res, next) => {
   const {username, password} = req.body;
   const id = req.payload._id;
-  if (username === "" || password === "") {
+  if (username === "" || password === "" || telephone === "") {
     return next(new ErrorResponse('Please fill all the fields before editing', 400))
   }
   const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
   if (!passwordRegex.test(password)) {
     return next(new ErrorResponse('Password must have at least 6 characters and contain at least one number, one lowercase and one uppercase letter', 400))
   }
+  const telephoneRegex = /^\+?(6\d{2}|7[1-9]\d{1})\d{6}$/;
+  if (!telephoneRegex.test(telephone)) {
+    return next(new ErrorResponse('Telephone number is not valid', 400));
+  }
   try {
     const salt = bcrypt.genSaltSync(saltRounds);
     const hashedPassword = bcrypt.hashSync(password, salt);
-    const updatedUser = await User.findByIdAndUpdate(id, { hashedPassword, username }, {new: true});
+    const updatedUser = await User.findByIdAndUpdate(id, { hashedPassword, username, telephone }, {new: true});
     res.status(202).json({ data: updatedUser });
   } catch (error) {
     next(error);
