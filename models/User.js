@@ -27,11 +27,11 @@ const userSchema = new Schema({
   telephone: {
     type: String,
     required: true
-  }, 
-  profilePicture: {
-    type: String,
-    default: "https://us.123rf.com/450wm/tuktukdesign/https://us.123rf.com/450wm/tuktukdesign/tuktukdesign1608/tuktukdesign160800043/61010830-icono-de-usuario-hombre-perfil-hombre-de-negocios-avatar-ilustraci%C3%B3n-vectorial-persona-glifo.jpg?ver=6/tuktukdesign160800043/61010830-icono-de-usuario-hombre-perfil-hombre-de-negocios-avatar-ilustraci%C3%B3n-vectorial-persona-glifo.jpg?ver=6"
   }
+  // profilePicture: {
+  //   type: String,
+  //   default: 'https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/user-male-circle-blue-512.png'
+  // }
 },
   {
     timestamps: true

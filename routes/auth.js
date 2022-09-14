@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const User = require('../models/User');
-const fileUploader = require("../config/cloudinary.config");
 const ErrorResponse = require('../utils/error');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
@@ -10,8 +9,8 @@ const saltRounds = 10;
 // @desc    SIGN UP new user
 // @route   POST /api/v1/auth/signup
 // @access  Public
-router.post('/signup', fileUploader.single('profilePicture'), async (req, res, next) => {
-  const { email, fullName, password, username, idNumber, telephone, profilePictureDefault } = req.body;
+router.post('/signup', async (req, res, next) => {
+  const { email, fullName, password, username, idNumber, telephone} = req.body;
   // Check if email or password or name are provided as empty string 
   if (email === "" || password === "" || username === "" || fullName === "" || idNumber === "" || telephone === "") {
     return next(new ErrorResponse('Please fill all the fields to register', 400))
@@ -37,13 +36,6 @@ router.post('/signup', fileUploader.single('profilePicture'), async (req, res, n
     return next(new ErrorResponse('Telephone number is not valid', 400));
   }
 
-  let profilePicture;
-  if(req.file) {
-    profilePicture = req.file.path;   
-  } else {
-    profilePicture = profilePictureDefault;
-  }
-
   try {
     const userMailInDB = await User.findOne({ email });
     const nifInDB = await User.findOne({idNumber});
@@ -56,8 +48,7 @@ router.post('/signup', fileUploader.single('profilePicture'), async (req, res, n
     else {
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const user = await User.create({ email, hashedPassword, username, fullName, idNumber, telephone, profilePicture });
-      console.log(user);
+      const user = await User.create({ email, hashedPassword, username, fullName, idNumber, telephone});
       const publicUser = { // Decide what fields of our user we want to return 
         fullName: user.fullName,
         email: user.email,
@@ -145,7 +136,6 @@ router.put('/user', isAuthenticated, async (req, res, next) => {
 router.get('/me', isAuthenticated, (req, res, next) => {
   // If JWT token is valid the payload gets decoded by the
   // isAuthenticated middleware and made available on `req.payload`
-  console.log('Whose token is on the request:', req.payload);
   // Send back the object with user data
   // previously set as the token payload
   res.status(200).json(req.payload);
