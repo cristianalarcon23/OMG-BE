@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const Item = require ('../models/Item');
 const Alert = require ('../models/Alert');
-const fileUploader = require("../config/cloudinary.config");
 const { isAuthenticated } = require('../middlewares/jwt');
 const ErrorResponse = require('../utils/error');
 
@@ -50,12 +49,17 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @access  Private
   router.get('/:id', isAuthenticated, async (req, res, next) => {
     const { id } = req.params;
+    const userId = req.payload.email;
     try {
-      const item = await Item.findById(id);
+      const item = await Item.findById(id).populate('owner');
       if (!item) {
         next(new ErrorResponse(`Item not found by id: ${id}`, 404));
       }
-      res.status(200).json({ data: item })
+      if (userId === item.owner.email) {
+        res.status(200).json({ data: item })
+      } else {
+        next(new ErrorResponse(`Unauthorised access`, 403))
+      }
     } catch (error) {
       next(error);
     }
@@ -65,13 +69,13 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @route   POST /api/v1/items
   // @access  Private
   router.post('/', isAuthenticated, async (req, res, next) => {
-    const { name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture } = req.body;
-    if (name === "" || brand === "" || secondHand === undefined || type === "" || serialNumber === "" ||  itemPicture === "" || snPicture === "") {
+    const { name, brand, newItem, type, serialNumber, itemPicture} = req.body;
+    if (name === "" || brand === "" || type === "" || serialNumber === "" ||  itemPicture === "") {
         return next(new ErrorResponse('Please fill all the fields to create your item', 400))
     }
     const id = req.payload._id;
     try {
-      const item = await Item.create({ name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture, owner: id });
+      const item = await Item.create({ name, brand, newItem, type, serialNumber, itemPicture, owner: id });
       if (!item) {
         next(new ErrorResponse('An error ocurred while creating the item', 500));
       }
@@ -87,17 +91,22 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @access  Private
   router.put('/:id', isAuthenticated, async (req, res, next) => {
     const { id } = req.params;
-    const { name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture } = req.body;
-    if (name === "" || brand === "" || type === "" || serialNumber === "" ||  itemPicture === "" || snPicture === "") {
+    const userId = req.payload.email;
+    const { name, brand, newItem, type, serialNumber, itemPicture} = req.body;
+    if (name === "" || brand === "" || newItem === "" || type === "" || serialNumber === "" ||  itemPicture === "") {
         return next(new ErrorResponse('Please fill all the fields to edit your item', 400))
     }
     try {
-      const item = await Item.findById(id);
+      const item = await Item.findById(id).populate('owner');
       if (!item) {
         next(new ErrorResponse(`Item not found by id: ${id}`, 404));
-      } else {
-        const updatedItem = await Item.findByIdAndUpdate(id, { name, brand, secondHand, type, serialNumber, itemPicture, snPicture, warrantyPicture }, { new: true });
+      } 
+      if (userId === item.owner.email) {
+        const updatedItem = await Item.findByIdAndUpdate(id, { name, brand, newItem, type, serialNumber, itemPicture}, { new: true });
         res.status(202).json({ data: updatedItem })
+      }
+      else {
+        next(new ErrorResponse(`Unauthorised access`, 403))
       }
     } catch (error) {
       next(error);

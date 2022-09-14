@@ -3,17 +3,30 @@ const Alert = require ('../models/Alert');
 const { isAuthenticated } = require('../middlewares/jwt');
 const ErrorResponse = require('../utils/error');
 
-// @desc    Creates stolen alert
+// @desc    Seacrhes for stolen alerts
 // @route   GET /api/v1/alerts/:id
+// @access  Private
+router.get('/:id', isAuthenticated, async (req, res, next) => {
+  const {id} = req.params;
+  try {
+      const alert = await Alert.findOne({ itemId: id });
+      res.status(201).json({ data: alert })
+    } catch (error) {
+      next(error);
+    }
+});
+
+// @desc    Creates stolen alert
+// @route   POST /api/v1/alerts/:id
 // @access  Private
 router.post('/:id', isAuthenticated, async (req, res, next) => {
     const user = req.payload._id;
     const {id} = req.params;
     try {
-        const alert = await Alert.create({ itemId: id, userId: user });
+        const alert = await Alert.create( {itemId: id, userId: user} );
         if (!alert) {
           next(new ErrorResponse('An error ocurred while creating the alert', 500));
-        }
+        } 
         res.status(201).json({ data: alert })
       } catch (error) {
         next(error);

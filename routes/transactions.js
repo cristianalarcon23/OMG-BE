@@ -52,10 +52,6 @@ router.post('/transfer/:id', isAuthenticated, async (req, res, next) => {
     const {id} = req.params;
     const token = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
     try {
-        const itemToCheck = await Item.findById(id);
-        if (itemToCheck.transactionToken !== null) {
-          next(new ErrorResponse('Existing token for item', 500));
-        }
         const itemTokened = await Item.findByIdAndUpdate(id, {transactionToken: token}, {new:true});
         if (!itemTokened) {
           next(new ErrorResponse('An error ocurred while creating the transfer', 500));
@@ -65,5 +61,21 @@ router.post('/transfer/:id', isAuthenticated, async (req, res, next) => {
         next(error);
       }
   });
+
+// @desc    Deletes token from item
+// @route   POST /api/v1/transactions/deletetoken/:id
+// @access  Private
+router.post('/deletetoken/:id', isAuthenticated, async (req, res, next) => {
+  const {id} = req.params;
+  try {
+      const itemUnTokened = await Item.findByIdAndUpdate(id, {transactionToken: null}, {new:true});
+      if (!itemUnTokened) {
+        next(new ErrorResponse('An error ocurred while creating the transfer', 500));
+      }
+      res.status(201).json({ data: itemUnTokened })
+    } catch (error) {
+      next(error);
+    }
+});
 
   module.exports = router;

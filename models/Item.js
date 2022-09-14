@@ -10,9 +10,9 @@ const itemSchema = new Schema({
     type: String,
     required: true
   },
-  secondHand: {
-    type: Boolean,
-    required: true
+  newItem: {
+    type: String,
+    default: 'Yes'
   },
   type: {
     type: String,
@@ -25,13 +25,6 @@ const itemSchema = new Schema({
   itemPicture: {
     type: String,
     required: true
-  },
-  snPicture: {
-    type: String,
-    required: true
-  },
-  warrantyPicture: {
-    type: String,
   },
   transactionToken: {
     type: String
