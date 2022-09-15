@@ -3,7 +3,7 @@ const Alert = require ('../models/Alert');
 const { isAuthenticated } = require('../middlewares/jwt');
 const ErrorResponse = require('../utils/error');
 
-// @desc    Seacrhes for stolen alerts
+// @desc    Searches for stolen alerts
 // @route   GET /api/v1/alerts/:id
 // @access  Private
 router.get('/:id', isAuthenticated, async (req, res, next) => {

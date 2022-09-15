@@ -24,20 +24,16 @@ router.get('/', isAuthenticated, async (req, res, next) => {
   // @desc    Search item by serial number
   // @route   GET /api/v1/items/search
   // @access  Public
-  router.get('/search', async (req, res, next) => {
+  router.post('/search', isAuthenticated, async (req, res, next) => {
     const {serialNumber} = req.body;
     if (serialNumber === "") {
       return next(new ErrorResponse('Please insert a Serial Number', 400))
     }
     try {
-      const item = await Item.findOne({serialNumber: serialNumber});
+      const item = await Item.findOne({serialNumber: serialNumber}).populate('owner');
       if (!item) {
         next(new ErrorResponse(`Item with serial number: ${serialNumber} is not registered in our database`, 404));
       }
-      const alert = await Alert.find({itemId: item._id});
-      if (alert.length !== 0) {
-        next(new ErrorResponse(`Item with serial number (${serialNumber}) is marked as lost/stolen`))
-      } 
       res.status(200).json({ data: item })
     } catch (error) {
       next(error);
@@ -72,6 +68,10 @@ router.get('/', isAuthenticated, async (req, res, next) => {
     const { name, brand, newItem, type, serialNumber, itemPicture} = req.body;
     if (name === "" || brand === "" || type === "" || serialNumber === "" ||  itemPicture === "") {
         return next(new ErrorResponse('Please fill all the fields to create your item', 400))
+    }
+    const snRegex = /[^a-z0-9]/gi;
+    if(!serialNumber.test(snRegex)) {
+      return next(new ErrorResponse('Serial Number must be registered only with letters and numbers'))
     }
     const id = req.payload._id;
     try {
