@@ -32,7 +32,7 @@ router.get('/', isAuthenticated, async (req, res, next) => {
     try {
       const item = await Item.findOne({serialNumber: serialNumber}).populate('owner');
       if (!item) {
-        next(new ErrorResponse(`Item with serial number: ${serialNumber} is not registered in our database`, 404));
+        next(new ErrorResponse(`Item with serial number ${serialNumber} is not registered in our database`, 404));
       }
       res.status(200).json({ data: item })
     } catch (error) {
@@ -47,7 +47,7 @@ router.get('/', isAuthenticated, async (req, res, next) => {
     const { id } = req.params;
     const userId = req.payload.email;
     try {
-      const item = await Item.findById(id).populate('owner');
+      const item = await Item.findById(id).populate('owner').populate('previousOwner');
       if (!item) {
         next(new ErrorResponse(`Item not found by id: ${id}`, 404));
       }
