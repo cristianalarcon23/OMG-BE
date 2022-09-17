@@ -158,7 +158,7 @@ router.get('/getuser', isAuthenticated, async (req, res, next) => {
   const id = req.payload._id;
   try {
     const userInDB = await User.findById(id);
-      res.status(200).json({ data: userInDB });
+    res.status(200).json({ data: userInDB });
   } catch (error) {
     next(error);
   }
