@@ -82,8 +82,10 @@ router.post('/login', async (req, res, next) => {
         const payload = {
           email: userInDB.email,
           username: userInDB.username,
-          _id: userInDB._id
+          _id: userInDB._id,
+          fullName: userInDB.fullName
         }
+        console.log(payload)
         // Use the jwt middleware to create de token
         const authToken = jwt.sign(
           payload,
@@ -106,7 +108,7 @@ router.post('/login', async (req, res, next) => {
 // @route   PUT /api/v1/auth/user
 // @access  Private
 router.put('/user', isAuthenticated, async (req, res, next) => {
-  const {username, password} = req.body;
+  const {username, password, telephone} = req.body;
   const id = req.payload._id;
   if (username === "" || password === "" || telephone === "") {
     return next(new ErrorResponse('Please fill all the fields before editing', 400))

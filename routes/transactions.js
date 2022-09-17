@@ -32,7 +32,7 @@ router.post('/receive', isAuthenticated, async (req, res, next) => {
     }
     const userId = req.payload._id;
     try {
-        const itemToCheck = await Item.findOne({transactionToken: parseInt(token)}).populate('owner');
+        const itemToCheck = await Item.findOne({transactionToken: token}).populate('owner');
         if (itemToCheck && email === itemToCheck.owner.email) {
             const itemReceived = await Item.findByIdAndUpdate(itemToCheck._id, {owner: userId, previousOwner: itemToCheck.owner._id, transactionToken: null}, {new:true});
             const transaction = await Transaction.create({itemId: itemToCheck._id, buyerId: userId, sellerId: itemToCheck.owner._id});
