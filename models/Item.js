@@ -22,8 +22,8 @@ const itemSchema = new Schema({
     type: String,
     required: true
   },
-  itemPicture: {
-    type: String,
+  imageUrls: {
+    type: [String],
     required: true
   },
   transactionToken: {

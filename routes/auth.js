@@ -39,11 +39,15 @@ router.post('/signup', async (req, res, next) => {
   try {
     const userMailInDB = await User.findOne({ email });
     const nifInDB = await User.findOne({idNumber});
+    const usernameInDB = await User.findOne({username})
     if (userMailInDB) {
       return next(new ErrorResponse(`User already exists with email ${email}`, 400))
     } 
     if (nifInDB) {
       return next(new ErrorResponse(`This ID is already registered`, 400))
+    }
+    if (usernameInDB) {
+      return next(new ErrorResponse(`Username is already registered`, 400))
     }
     else {
       const salt = bcrypt.genSaltSync(saltRounds);
@@ -122,10 +126,15 @@ router.put('/user', isAuthenticated, async (req, res, next) => {
     return next(new ErrorResponse('Telephone number is not valid', 400));
   }
   try {
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    const updatedUser = await User.findByIdAndUpdate(id, { hashedPassword, username, telephone }, {new: true});
-    res.status(202).json({ data: updatedUser });
+    const usernameInDB = await User.findOne({username})
+    if (usernameInDB) {
+      return next(new ErrorResponse(`Username is already registered`, 400))
+    } else {
+      const salt = bcrypt.genSaltSync(saltRounds);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+      const updatedUser = await User.findByIdAndUpdate(id, { hashedPassword, username, telephone }, {new: true});
+      res.status(202).json({ data: updatedUser });
+    }
   } catch (error) {
     next(error);
   }
@@ -141,6 +150,19 @@ router.get('/me', isAuthenticated, (req, res, next) => {
   // Send back the object with user data
   // previously set as the token payload
   res.status(200).json(req.payload);
+})
+
+// @desc    GET logged in user model
+// @route   GET /api/v1/auth/getuser
+// @access  Private
+router.get('/getuser', isAuthenticated, async (req, res, next) => {
+  const id = req.payload._id;
+  try {
+    const userInDB = await User.findById(id);
+    res.status(200).json({ data: userInDB });
+  } catch (error) {
+    next(error);
+  }
 })
 
 module.exports = router;
