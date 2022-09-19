@@ -52,7 +52,7 @@ router.post('/transfer/:id', isAuthenticated, async (req, res, next) => {
     const {id} = req.params;
     const token = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
     try {
-        const itemTokened = await Item.findByIdAndUpdate(id, {transactionToken: token}, {new:true});
+        const itemTokened = await Item.findByIdAndUpdate(id, {transactionToken: token}, {new:true}).populate('previousOwner');
         if (!itemTokened) {
           next(new ErrorResponse('An error ocurred while creating the transfer', 500));
         }
