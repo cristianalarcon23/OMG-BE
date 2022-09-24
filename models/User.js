@@ -29,10 +29,6 @@ const userSchema = new Schema({
     type: String,
     required: true
   }
-  // profilePicture: {
-  //   type: String,
-  //   default: 'https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/user-male-circle-blue-512.png'
-  // }
 },
   {
     timestamps: true
