@@ -169,4 +169,4 @@ Alerts in the database have the following properties:
 ## Useful links
 
 - [Frontend repository](https://github.com/cristianalarcon23/OMG-FE)
-- [Frontend deploy](www.ohmygoods.es)
+- [Frontend deploy](https://www.ohmygoods.es)
